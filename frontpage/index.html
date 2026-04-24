@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kisan Market</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #f4f4f4; }
+
+    .card {
+      display: inline-block;
+      width: 200px;
+      padding: 30px;
+      margin: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+      cursor: pointer;
+    }
+
+    .hidden { display: none; }
+
+    input {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 200px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: green;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🌾 Kisan Market</h1>
+
+<!-- Role Select -->
+<div id="rolePage">
+  <h2>Select Role</h2>
+
+  <div class="card" onclick="selectRole('farmer')">
+    👨‍🌾 Farmer
+  </div>
+
+  <div class="card" onclick="selectRole('customer')">
+    🛒 Customer
+  </div>
+</div>
+
+<!-- Login -->
+<div id="loginPage" class="hidden">
+  <h2 id="roleTitle"></h2>
+
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+
+  <button onclick="login()">Login</button><br><br>
+  <button onclick="back()">⬅ Back</button>
+</div>
+
+<script>
+let role = "";
+
+// Select role
+function selectRole(r) {
+  role = r;
+  document.getElementById("rolePage").classList.add("hidden");
+  document.getElementById("loginPage").classList.remove("hidden");
+
+  document.getElementById("roleTitle").innerText =
+    role === "farmer" ? "Farmer Login" : "Customer Login";
+}
+
+// Back
+function back() {
+  document.getElementById("loginPage").classList.add("hidden");
+  document.getElementById("rolePage").classList.remove("hidden");
+}
+
+// Login
+function login() {
+  let username = document.getElementById("username").value;
+  let password = document.getElementById("password").value;
+
+  fetch("http://localhost:3000/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      username: username,
+      password: password,
+      role: role
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert("Login Successful as " + role);
+    } else {
+      alert("Wrong username or password ❌");
+    }
+  });
+}
+</script>
+
+</body>
+</html>
