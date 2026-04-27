@@ -1,0 +1,23 @@
+h1{
+    color : rgb(10, 192, 10);
+    text-align-last: center;
+    font-size: 60px;
+}
+h3{
+    color : blue;
+    text-align:center;
+    font-size: large;
+}
+button{
+    color : rgb(256, 256, 256);
+    background-color: rgb(15, 131, 15);
+    height: 50px;
+    width: 100px;
+    border-radius: 10px;
+    font-size: 20px;
+    outline-color: rgb(123, 0, 224);
+}
+button:active{
+    box-shadow: none;
+    transform: translate(2px, 2px);
+}
