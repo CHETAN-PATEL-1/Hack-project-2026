@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: #f4f4f4;
+    }
+      margin-top: 100px;
+      background: white;
+      padding: 30px;
+      display: inline-block;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+
+    input {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 200px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: green;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="login-box">
+  <h2 id="roleTitle"></h2>
+
+  <input type="text" placeholder="Username">
+  <input type="password" placeholder="Password">
+
+  <button onclick="login()">Login</button>
+</div>
+
+<script>
+let role = localStorage.getItem("role");
+
+document.getElementById("roleTitle").innerText =
+  role === "farmer" ? "Farmer Login" : "Customer Login";
+
+function login() {
+  alert("Login Successful as " + role);
+
+  if(role === "farmer") {
+    window.location.href = "add.html"; // farmer page
+  } else {
+    window.location.href = "index.html"; // customer page
+  }
+}
+</script>
+
+</body>
+</html>
