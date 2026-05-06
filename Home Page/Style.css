@@ -17,23 +17,22 @@ h3 {
     font-size: clamp(16px, 2.5vw, 24px);
 }
 
-/* Button base style */
+/* Farmer button */
 #temp1{
     margin-left: 310px;
     height: auto;
     width: auto;
-    padding: 12px 20px;
     border-radius: 10px;
     font-size: clamp(14px, 2vw, 20px);
     outline-color: rgb(123, 0, 224);
     border: none;
 }
 
+/* Costumer botton */
 #temp2{
     padding-right:0px;
     height: auto;
     width: auto;
-    padding: 12px 20px;
     border-radius: 10px;
     font-size: clamp(14px, 2vw, 20px);
     outline-color: rgb(123, 0, 224);
