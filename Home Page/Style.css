@@ -18,7 +18,19 @@ h3 {
 }
 
 /* Button base style */
-button {
+#temp1{
+    margin-left: 310px;
+    height: auto;
+    width: auto;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: clamp(14px, 2vw, 20px);
+    outline-color: rgb(123, 0, 224);
+    border: none;
+}
+
+#temp2{
+    padding-right:0px;
     height: auto;
     width: auto;
     padding: 12px 20px;
