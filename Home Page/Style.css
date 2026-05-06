@@ -49,11 +49,10 @@ button:active {
 /* Farmer button */
 .Farmer-btn {
     display: block;
-    margin: 20px auto; /* centers properly */
+    margin: 15px auto; /* centers properly */
     height: auto;
     width: 80%;
-    max-width: 200px;
-    cursor: pointer;
+    max-width: 300px;
 }
 
 /* Tablet */
