@@ -1,3 +1,4 @@
 function loginCustomer() {
-  alert("Customer Login Successful")
+  alert("Customer Login Successful");
+  window.location.href = "../Card page/cart.html";
 }
