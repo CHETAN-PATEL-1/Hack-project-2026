@@ -1,7 +1,8 @@
 body {
     margin: 0;
     padding: 0;
-    text-align: center;
+    /* text-align: center; */
+    background-image: linear-gradient(to right, rgb(207, 249, 194) , rgb(247, 252, 139));
 }
 
 /* Heading styles */
@@ -11,17 +12,44 @@ h1 {
     font-size: clamp(32px, 5vw, 60px); /* responsive font */
 }
 
+#navbar{
+    background-color: blueviolet;
+    height: 70px;
+    width: auto;
+    margin-top: 0px;
+
+}
+#nav-h3{
+    color: aliceblue;
+    width: 200px;
+    margin: 0%;
+}
+.nav{
+    color: aliceblue;
+    text-decoration: none;
+    padding-right: 100px;
+    padding-left: 20px;
+    padding-top: 10px;
+    font-size: 20px;
+}
+
 h3 {
     color: blue;
     text-align: center;
     font-size: clamp(16px, 2.5vw, 24px);
 }
+#home-btn{
+    display:flex;
+    gap: 200px;
+    justify-content: center;
+    text-align: center;
+}
 
 /* Farmer button */
 #temp1{
-    margin-left: 310px;
-    height: auto;
-    width: auto;
+    gap: 10px;
+    height: 35px;
+    width: 158px;
     border-radius: 10px;
     font-size: clamp(14px, 2vw, 20px);
     outline-color: rgb(123, 0, 224);
@@ -31,8 +59,8 @@ h3 {
 /* Costumer botton */
 #temp2{
     padding-right:0px;
-    height: auto;
-    width: auto;
+    height: 35px;
+    width: 158px;
     border-radius: 10px;
     font-size: clamp(14px, 2vw, 20px);
     outline-color: rgb(123, 0, 224);
