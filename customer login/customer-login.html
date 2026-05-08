@@ -1,20 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Customer Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Farmer Login & Signup</title>
 
   <link rel="stylesheet" href="customer-login.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
-  <div class="login-box">
-    <h1>Customer Login</h1>
+  <div class="container">
 
-    <input type="email" placeholder="Email">
+    <!-- LEFT -->
+    <div class="left-section">
 
-    <input type="password" placeholder="Password">
+      <div class="overlay"></div>
 
-    <button onclick="loginCustomer()">Login</button>
+      <div class="left-content">
+
+        <h1 id="welcomeText">
+        Welcome Customer 👨‍🌾
+        </h1>
+
+        <p id="subText">
+        Manage your crops, orders and farming business easily.
+        </p>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right-section">
+
+      <!-- Language Button -->
+      <div class="language-box">
+        <button onclick="toggleLanguage()" id="langBtn">
+          हिंदी
+        </button>
+      </div>
+
+      <!-- FORM BOX -->
+      <div class="login-box">
+
+        <!-- Tabs -->
+        <div class="tabs">
+
+          <button class="tab active" id="loginTab"
+            onclick="showLogin()">
+            Login
+          </button>
+
+          <button class="tab" id="signupTab"
+            onclick="showSignup()">
+            Sign Up
+          </button>
+
+        </div>
+
+        <h2 id="formTitle">Customer Login</h2>
+
+        <!-- SIGNUP NAME -->
+        <div class="input-group signup-field" id="nameField">
+          <input type="text" id="name"
+            placeholder="Full Name">
+        </div>
+
+        <!-- EMAIL -->
+        <div class="input-group">
+          <input type="email" id="email"
+            placeholder="Email Address">
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="input-group">
+          <input type="password" id="password"
+            placeholder="Password">
+        </div>
+
+        <!-- BUTTON -->
+        <button class="login-btn"
+          id="mainBtn"
+          onclick="submitForm()">
+
+          Login
+
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
 
   <script src="customer-login.js"></script>
