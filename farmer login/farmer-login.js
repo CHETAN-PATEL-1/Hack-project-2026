@@ -99,8 +99,14 @@ function setLanguage(lang) {
     document.getElementById("phone").placeholder =
       "मोबाइल नंबर";
 
+    document.getElementById("otp").placeholder =
+      "OTP डालें";
+
     document.getElementById("signupPassword").placeholder =
       "पासवर्ड बनाएं";
+
+    document.getElementById("reEnterPassword").placeholder =
+      "पासवर्ड की पुष्टि करें";
 
     document.getElementById("loginBtn").innerText =
       "लॉगिन";
