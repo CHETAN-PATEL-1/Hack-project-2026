@@ -5,6 +5,20 @@ function loginCustomer() {
 }
 
 function signupCustomer() {
+
+  let password =
+    document.getElementById("signupPassword").value;
+
+  let rePassword =
+    document.getElementById("reEnterPassword").value;
+
+  // Password Match Check
+  if (password !== rePassword) {
+
+    alert("Passwords do not match");
+    return;
+  }
+
   alert("Signup Successful");
 }
 
@@ -57,6 +71,9 @@ function setLanguage(lang) {
 
     document.getElementById("signupPassword").placeholder =
       "पासवर्ड बनाएं";
+
+    document.getElementById("reEnterPassword").placeholder =
+      "पासवर्ड फिर से दर्ज करें";
 
     document.getElementById("loginBtn").innerText =
       "लॉगिन";
