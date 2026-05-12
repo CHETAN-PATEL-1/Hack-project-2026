@@ -1,6 +1,6 @@
 // Farmer dashboard product add + inventory (client-side)
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = (typeof window !== 'undefined' && window.F2C_API_ORIGIN ? window.F2C_API_ORIGIN : 'http://localhost:5000') + '/api';
 
 function getProductsLocal() {
   try { return JSON.parse(localStorage.getItem('localProducts') || '[]'); } catch (e) { return []; }
@@ -40,7 +40,7 @@ function renderProducts(products) {
   }
   all.forEach(p => {
     const card = el('div', 'product-card');
-    const img = el('img'); img.src = p.image || 'https://via.placeholder.com/160x100?text=No+Image';
+    const img = el('img'); img.src = (typeof F2C_resolveUploadUrl === 'function' ? F2C_resolveUploadUrl(p.image, 'https://via.placeholder.com/160x100?text=No+Image') : (p.image || 'https://via.placeholder.com/160x100?text=No+Image'));
     img.alt = p.name;
     card.appendChild(img);
     const name = el('h4'); name.innerText = p.name; card.appendChild(name);

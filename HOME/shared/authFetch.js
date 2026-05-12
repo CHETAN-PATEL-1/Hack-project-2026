@@ -6,7 +6,8 @@
 
   async function tryRefresh() {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/refresh', { method: 'POST', credentials: 'include' });
+      var origin = (typeof window !== 'undefined' && window.F2C_API_ORIGIN) ? window.F2C_API_ORIGIN : 'http://localhost:5000';
+      const res = await fetch(origin + '/api/auth/refresh', { method: 'POST', credentials: 'include' });
       if (!res.ok) return false;
       // server sets new accessToken cookie; return true on success
       return true;

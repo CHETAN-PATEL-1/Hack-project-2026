@@ -11,7 +11,7 @@
     <header>
       <h1 id="welcome">Welcome, Farmer</h1>
       <div class="actions">
-        <a href="../../Home Page/index.html">Home</a>
+        <a href="../../Home%20Page/index.html">Home</a>
         <button id="logoutBtn">Logout</button>
       </div>
     </header>
@@ -38,9 +38,11 @@
     </main>
   </div>
 
+<script src="../../shared/apiOrigin.js"></script>
+<script src="../../shared/authFetch.js"></script>
 <script>
   // Try to fetch latest profile from backend using cookie-based auth.
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = (window.F2C_API_ORIGIN || 'http://localhost:5000') + '/api';
 
   async function loadProfile() {
     // Check localStorage first
@@ -92,6 +94,5 @@
     window.location.href = 'farmer-login.html';
   });
 </script>
-<script src="../../shared/authFetch.js"></script>
 </body>
 </html>

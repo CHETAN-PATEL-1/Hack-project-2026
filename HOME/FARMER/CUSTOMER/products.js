@@ -1,9 +1,9 @@
 (function(){
-  const API_BASE = 'http://localhost:5000/api/products';
-  // Same host as API so /uploads/... resolves when the page is opened from another origin (e.g. Live Server).
-  const API_ORIGIN = (function () {
-    try { return new URL(API_BASE).origin; } catch (e) { return 'http://localhost:5000'; }
+  const API_ORIGIN = (typeof window !== 'undefined' && window.F2C_API_ORIGIN) ? window.F2C_API_ORIGIN : (function () {
+    try { if (String(window.location.port) === '5000') return window.location.origin; } catch (e) {}
+    return 'http://localhost:5000';
   })();
+  const API_BASE = API_ORIGIN + '/api/products';
   const grid = document.getElementById('productsGrid');
   const searchInput = document.getElementById('searchInput');
   const minPriceInput = document.getElementById('minPrice');

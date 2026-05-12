@@ -63,9 +63,11 @@
     </main>
   </div>
 
+<script src="../../shared/apiOrigin.js"></script>
+<script src="../../shared/authFetch.js"></script>
 <script>
   // Load profile and handle save
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = (window.F2C_API_ORIGIN || 'http://localhost:5000') + '/api';
 
   async function loadProfile() {
     try {
@@ -358,6 +360,5 @@
     }
   });
 </script>
-<script src="../../shared/authFetch.js"></script>
 </body>
 </html>

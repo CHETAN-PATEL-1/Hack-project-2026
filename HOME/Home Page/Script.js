@@ -81,7 +81,7 @@ function addToCart(){
       if(browse){
         browse.addEventListener('click', function(e){
           // anchor already present, but ensure navigation works if JS interception needed
-          window.location.href = '../CUSTOMER/products.html';
+          window.location.href = '../FARMER/CUSTOMER/products.html';
         });
       }
     });

@@ -76,7 +76,7 @@ async function signupFarmer() {
   if (findUserByEmail(email, 'farmer')) return alert('Email already registered (local)');
 
   const payload = { name, email, phone, password, role: 'farmer' };
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = (window.F2C_API_ORIGIN || 'http://localhost:5000') + '/api';
 
   try {
     const res = await fetch(API_BASE + '/auth/register', {
@@ -128,7 +128,7 @@ async function loginFarmer() {
 
   if (!email || !password) return alert('Please enter email and password');
 
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = (window.F2C_API_ORIGIN || 'http://localhost:5000') + '/api';
   try {
     const res = await fetch(API_BASE + '/auth/login', {
       method: 'POST',

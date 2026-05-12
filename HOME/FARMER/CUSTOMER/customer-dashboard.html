@@ -11,7 +11,7 @@
     <header>
       <h1 id="welcome">Welcome, Customer</h1>
       <div class="actions">
-        <a href="../Home Page/index.html">Home</a>
+        <a href="../../Home%20Page/index.html">Home</a>
         <button id="logoutBtn">Logout</button>
       </div>
     </header>
@@ -46,9 +46,18 @@
     </main>
   </div>
 
+<script src="../../shared/apiOrigin.js"></script>
+<script src="../../shared/authFetch.js"></script>
 <script>
+  const API_BASE = (window.F2C_API_ORIGIN || 'http://localhost:5000') + '/api';
+
+  function productCardImageUrl(src) {
+    return (typeof F2C_resolveUploadUrl === 'function')
+      ? F2C_resolveUploadUrl(src)
+      : (src || 'https://via.placeholder.com/200x150?text=No+Image');
+  }
+
   async function init() {
-    const API_BASE = 'http://localhost:5000/api';
     
     // Check localStorage first
     const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -97,7 +106,6 @@
 
   // Load products
   async function loadProducts(filters = {}) {
-    const API_BASE = 'http://localhost:5000/api';
     const query = new URLSearchParams(filters).toString();
     try {
       const res = await fetch(`${API_BASE}/products?${query}`);
@@ -125,7 +133,7 @@
       const card = document.createElement('div');
       card.className = 'product-card';
       card.innerHTML = `
-        <img src="${p.image || 'https://via.placeholder.com/200x150?text=No+Image'}" alt="${p.name}">
+        <img src="${productCardImageUrl(p.image)}" alt="${p.name}">
         <h3>${p.name}</h3>
         <p class="price">₹${p.price} / kg</p>
         <p class="quantity">Available: ${p.quantity} kg</p>
@@ -197,7 +205,6 @@
   });
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
-    const API_BASE = 'http://localhost:5000/api';
     try {
       if (window.fetchWithAuth) await fetchWithAuth(API_BASE + '/auth/logout', { method: 'POST' });
       else await fetch(API_BASE + '/auth/logout', { method: 'POST', credentials: 'include' });

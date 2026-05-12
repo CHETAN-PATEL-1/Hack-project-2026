@@ -44,7 +44,17 @@
     </main>
   </div>
 
+<script src="../../shared/apiOrigin.js"></script>
+<script src="../../shared/authFetch.js"></script>
 <script>
+  const API_BASE = (window.F2C_API_ORIGIN || 'http://localhost:5000') + '/api';
+
+  function cartLineImageUrl(src) {
+    return (typeof F2C_resolveUploadUrl === 'function')
+      ? F2C_resolveUploadUrl(src, 'https://via.placeholder.com/100x75?text=No+Image')
+      : (src || 'https://via.placeholder.com/100x75?text=No+Image');
+  }
+
   function getCart() {
     return JSON.parse(localStorage.getItem('cart') || '[]');
   }
@@ -77,7 +87,7 @@
       const itemDiv = document.createElement('div');
       itemDiv.className = 'cart-item';
       itemDiv.innerHTML = `
-        <img src="${item.image || 'https://via.placeholder.com/100x75?text=No+Image'}" alt="${item.name}">
+        <img src="${cartLineImageUrl(item.image)}" alt="${item.name}">
         <div class="item-details">
           <h4>${item.name}</h4>
           <p>Farmer: ${item.farmer}</p>
@@ -165,7 +175,6 @@
   document.getElementById('confirmOrderBtn').addEventListener('click', confirmOrder);
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
-    const API_BASE = 'http://localhost:5000/api';
     try {
       if (window.fetchWithAuth) await fetchWithAuth(API_BASE + '/auth/logout', { method: 'POST' });
       else await fetch(API_BASE + '/auth/logout', { method: 'POST', credentials: 'include' });
@@ -178,6 +187,5 @@
   // Init
   renderCart();
 </script>
-<script src="../shared/authFetch.js"></script>
 </body>
 </html>
