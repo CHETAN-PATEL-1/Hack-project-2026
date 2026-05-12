@@ -1,0 +1,7 @@
+body{font-family:Arial, sans-serif;background:#fefefe;margin:0;padding:20px}
+.dash-container{max-width:900px;margin:0 auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+header{display:flex;justify-content:space-between;align-items:center}
+header h1{margin:0;color:#2f6f44}
+.actions a{margin-right:12px;color:#2f6f44;text-decoration:none}
+.actions button{background:#2f6f44;color:#fff;border:none;padding:8px 12px;border-radius:4px;cursor:pointer}
+.summary h2{color:#2f6f44}

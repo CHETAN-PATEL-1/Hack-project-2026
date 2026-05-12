@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer Dashboard</title>
+  <link rel="stylesheet" href="farmer-dashboard.css">
+</head>
+<body>
+  <div class="dash-container">
+    <header>
+      <h1 id="welcome">Welcome, Farmer</h1>
+      <div class="actions">
+        <a href="../../Home Page/index.html">Home</a>
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="summary">
+        <h2>Your Dashboard (MVP)</h2>
+        <p>This is a placeholder dashboard. Next steps: add product listing, add product form, inventory view.</p>
+      </section>
+
+      <section class="links">
+        <button id="showAddProduct">Add Product</button>
+        <button id="viewInventory">View Inventory</button>
+      </section>
+
+      <!-- Add Product Form -->
+      <section class="add-product hidden" id="addProductSection">
+        <h3>Add New Product</h3>
+        <div class="form-row">
+          <label>Product Name</label>
+          <input id="prodName" type="text" placeholder="e.g. Fresh Tomatoes">
+        </div>
+        <div class="form-row">
+          <label>Price (₹/kg)</label>
+          <input id="prodPrice" type="number" placeholder="e.g. 40">
+        </div>
+        <div class="form-row">
+          <label>Quantity (kg)</label>
+          <input id="prodQty" type="number" placeholder="e.g. 100">
+        </div>
+        <div class="form-row">
+          <label>Image File (optional)</label>
+          <input id="prodImageFile" type="file" accept="image/*">
+          <small>Or provide an image URL below</small>
+        </div>
+        <div class="form-row">
+          <label>Preview</label>
+          <img id="prodPreview" class="preview hidden" alt="Image preview">
+        </div>
+        <div class="form-row">
+          <label>Image URL (optional)</label>
+          <input id="prodImage" type="text" placeholder="Optional image URL">
+        </div>
+        <div class="form-row">
+          <label>Notes</label>
+          <input id="prodNotes" type="text" placeholder="Optional notes">
+        </div>
+        <div class="form-actions">
+          <button id="addProductBtn">Save Product</button>
+          <button id="cancelAdd">Cancel</button>
+        </div>
+      </section>
+
+      <!-- Inventory List -->
+      <section class="inventory" id="inventorySection">
+        <h3>Your Inventory</h3>
+        <div id="productList" class="product-list"></div>
+      </section>
+    </main>
+  </div>
+
+<script>
+  // Try to fetch latest profile from backend using cookie-based auth.
+  const API_BASE = 'http://localhost:5000/api';
+
+  async function loadProfile() {
+    // Prefer fetchWithAuth if present; otherwise try credentials include
+    try {
+      const meRes = (window.fetchWithAuth)
+        ? await fetchWithAuth(API_BASE + '/user/me')
+        : await fetch(API_BASE + '/user/me', { credentials: 'include' });
+      if (meRes && meRes.ok) {
+        const data = await meRes.json();
+        const u = data.user;
+        localStorage.setItem('currentUser', JSON.stringify({ id: u._id || u.id, name: u.name, email: u.email, role: u.role }));
+        document.getElementById('welcome').innerText = `Welcome, ${u.name}`;
+        const p = document.createElement('p');
+        p.innerText = `Email: ${u.email}`;
+        p.style.fontSize = '13px';
+        p.style.color = '#444';
+        document.querySelector('.summary').appendChild(p);
+        return;
+      }
+    } catch (err) {
+      console.warn('Failed to fetch profile from server:', err);
+    }
+
+    // Fallback: use localStorage currentUser if available
+    const current = JSON.parse(localStorage.getItem('currentUser'));
+    if (!current) {
+      window.location.href = 'farmer-login.html';
+      return;
+    }
+    document.getElementById('welcome').innerText = `Welcome, ${current.name}`;
+    const p = document.createElement('p');
+    p.innerText = `Email: ${current.email || ''}`;
+    p.style.fontSize = '13px';
+    p.style.color = '#444';
+    document.querySelector('.summary').appendChild(p);
+  }
+
+  loadProfile();
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    try {
+      if (window.fetchWithAuth) {
+        await fetchWithAuth(API_BASE + '/auth/logout', { method: 'POST' });
+      } else {
+        await fetch(API_BASE + '/auth/logout', { method: 'POST', credentials: 'include' });
+      }
+    } catch (e) { /* ignore */ }
+    localStorage.removeItem('currentUser');
+    window.location.href = 'farmer-login.html';
+  });
+</script>
+<script src="../../shared/authFetch.js"></script>
+<script src="farmer-dashboard.js"></script>
+</body>
+</html>

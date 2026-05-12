@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Products - Marketplace</title>
+  <link rel="stylesheet" href="products.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1>Marketplace</h1>
+      <nav>
+        <a href="../Home Page/index.html">Home</a>
+        <a href="customer login/customer-login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="controls">
+      <input id="searchInput" type="search" placeholder="Search products by name..." />
+      <div class="pagination-controls">
+        <label for="pageSize">Per page:</label>
+        <select id="pageSize">
+          <option value="6">6</option>
+          <option value="12" selected>12</option>
+          <option value="24">24</option>
+        </select>
+        <div id="pager" class="pager">
+          <button id="prevPage">Prev</button>
+          <span id="pageInfo">1 / 1</span>
+          <button id="nextPage">Next</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="productsGrid" class="grid" aria-live="polite"></section>
+  </main>
+
+  <script src="products.js"></script>
+</body>
+</html>

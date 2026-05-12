@@ -75,3 +75,13 @@ function addToCart(){
     function addToCart(){
       alert("Product Added To Cart!");
     }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      const browse = document.getElementById('browseBtn');
+      if(browse){
+        browse.addEventListener('click', function(e){
+          // anchor already present, but ensure navigation works if JS interception needed
+          window.location.href = '../CUSTOMER/products.html';
+        });
+      }
+    });
