@@ -77,7 +77,7 @@
       if (meRes && meRes.ok) {
         const data = await meRes.json();
         const u = data.user;
-        localStorage.setItem('currentUser', JSON.stringify({ id: u._id || u.id, name: u.name, email: u.email, role: u.role }));
+        localStorage.setItem('currentUser', JSON.stringify({ id: String(u._id != null ? u._id : u.id), name: u.name, email: u.email, role: u.role }));
         return;
       }
     } catch (err) {
@@ -242,7 +242,6 @@
         if (product.notes) form.append('notes', product.notes);
         if (product.category) form.append('category', product.category);
         if (product.location) form.append('location', product.location);
-        if (product.image) form.append('image', product.image);
         form.append('image', file, file.name);
 
         const res = useFetchWithAuth
@@ -282,13 +281,32 @@
     const saveBtn = document.getElementById('saveProductBtn');
     const cancelBtn = document.getElementById('cancelBtn');
 
+    cancelBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.location.href = editingId ? 'view-inventory.html' : 'farmer-dashboard.html';
+    });
+
+    // Image preview handling
+    const fileInput = document.getElementById('prodImageFile');
+    const previewImg = document.getElementById('prodPreview');
+    let currentPreviewUrl = null;
+
+    function clearPreview() {
+      if (currentPreviewUrl) {
+        URL.revokeObjectURL(currentPreviewUrl);
+        currentPreviewUrl = null;
+      }
+      previewImg.src = '';
+      previewImg.classList.add('hidden');
+      if (fileInput) fileInput.value = '';
+    }
+
     saveBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       const name = document.getElementById('prodName').value.trim();
       const price = parseFloat(document.getElementById('prodPrice').value);
       const qty = parseFloat(document.getElementById('prodQty').value);
       const image = document.getElementById('prodImage').value.trim();
-      const fileInput = document.getElementById('prodImageFile');
       const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
       const notes = document.getElementById('prodNotes').value.trim();
       const category = document.getElementById('prodCategory').value.trim();
@@ -314,28 +332,19 @@
 
       const res = editingId ? await updateProduct(product, file) : await saveProduct(product, file);
       alert('Product ' + (editingId ? 'updated' : 'saved') + ' (' + (res && res.source ? res.source : 'local') + ')');
-      window.location.href = 'view-inventory.html'; // Redirect to inventory
-    });
-
-    cancelBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      window.location.href = editingId ? 'view-inventory.html' : 'farmer-dashboard.html';
-    });
-
-    // Image preview handling
-    const fileInput = document.getElementById('prodImageFile');
-    const previewImg = document.getElementById('prodPreview');
-    let currentPreviewUrl = null;
-
-    function clearPreview() {
-      if (currentPreviewUrl) {
-        URL.revokeObjectURL(currentPreviewUrl);
-        currentPreviewUrl = null;
+      if (editingId) {
+        window.location.href = 'view-inventory.html';
+      } else {
+        document.getElementById('prodName').value = '';
+        document.getElementById('prodPrice').value = '';
+        document.getElementById('prodQty').value = '';
+        document.getElementById('prodImage').value = '';
+        document.getElementById('prodNotes').value = '';
+        document.getElementById('prodCategory').value = '';
+        document.getElementById('prodLocation').value = '';
+        clearPreview();
       }
-      previewImg.src = '';
-      previewImg.classList.add('hidden');
-      if (fileInput) fileInput.value = '';
-    }
+    });
 
     if (fileInput) {
       fileInput.addEventListener('change', () => {

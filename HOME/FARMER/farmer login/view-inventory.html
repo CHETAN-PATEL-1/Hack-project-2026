@@ -52,8 +52,20 @@
     statusEl.classList.toggle('error', isError);
   }
 
+  function ownerUserId(product) {
+    if (!product || product.ownerId == null) return '';
+    var o = product.ownerId;
+    if (typeof o === 'string' || typeof o === 'number') return String(o);
+    if (typeof o === 'object') {
+      if (o._id != null) return String(o._id);
+      if (o.id != null) return String(o.id);
+    }
+    return String(o);
+  }
+
   function ownsProduct(product, userId) {
-    return product.ownerId === userId || (product.ownerId && product.ownerId._id === userId);
+    if (userId == null || userId === '') return false;
+    return ownerUserId(product) === String(userId);
   }
 
   function renderProducts(products) {
@@ -98,7 +110,7 @@
 
   async function fetchMyProducts() {
     const user = getCurrentUser();
-    if (!user) return getProductsLocal().filter(p => p.ownerId === user.id);
+    if (!user) return getProductsLocal().filter(p => ownsProduct(p, user && user.id));
 
     try {
       const requestOptions = { method: 'GET', credentials: 'include' };
@@ -176,7 +188,7 @@
       if (meRes && meRes.ok) {
         const data = await meRes.json();
         const u = data.user;
-        localStorage.setItem('currentUser', JSON.stringify({ id: u._id || u.id, name: u.name, email: u.email, role: u.role }));
+        localStorage.setItem('currentUser', JSON.stringify({ id: String(u._id != null ? u._id : u.id), name: u.name, email: u.email, role: u.role }));
         return;
       }
     } catch (err) {

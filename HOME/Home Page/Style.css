@@ -46,6 +46,17 @@ nav button{
   font-weight:bold;
 }
 
+nav .nav-buttons{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+
+nav .nav-buttons button{
+  margin-left:0;
+}
+
 /* Language Buttons */
 
 .language-buttons{
@@ -178,9 +189,12 @@ footer h3{
   color:#4caf50;
 }
 
-footer p{
-  margin:8px 0;
-  color:#ccc;
+footer a{
+  color:#8bc34a;
+  text-decoration:none;
+}
+footer a:hover{
+  text-decoration:underline;
 }
 
 footer input{

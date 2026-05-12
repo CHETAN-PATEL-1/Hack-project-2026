@@ -30,12 +30,35 @@ function validateEmail(email) {
   return re.test(email);
 }
 
+/** Indian mobile: 10 digits, starts with 6–9 (after stripping spaces/dashes). */
+function validateIndianMobile(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  return /^[6-9]\d{9}$/.test(digits);
+}
+
+function digitsOnlyPhone(phone) {
+  return String(phone || '').replace(/\D/g, '');
+}
+
 // -------------------- OTP --------------------
 function generateOTP() {
+  const phoneEl = document.getElementById('phone');
+  const emailEl = document.getElementById('signupEmail');
+  const phone = phoneEl ? phoneEl.value.trim() : '';
+  const email = emailEl ? emailEl.value.trim() : '';
+
+  if (!validateIndianMobile(phone)) {
+    return alert('पहले 10 अंकों का वैध मोबाइल नंबर दर्ज करें (6–9 से शुरू)।');
+  }
+  if (!email || !validateEmail(email)) {
+    return alert('पहले ईमेल भरें और Verify करें।');
+  }
+  if (findUserByEmail(email, 'customer')) return alert('Email already registered');
+
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const expiry = Date.now() + 5 * 60 * 1000; // 5 minutes
   localStorage.setItem('generatedOTP', otp);
-  localStorage.setItem('generatedOTPExpiry', expiry);
+  localStorage.setItem('generatedOTPExpiry', String(expiry));
   alert('Your OTP is: ' + otp + '\n(Valid for 5 minutes)');
 }
 
@@ -67,12 +90,12 @@ async function signupCustomer() {
 
   if (!name || !email || !phone || !otp || !password || !rePass) return alert('Please fill all required fields');
   if (!validateEmail(email)) return alert('Invalid email');
-  if (phone.length < 8) return alert('Enter a valid mobile number');
-  if (!isOTPValid(otp)) return alert('Invalid or expired OTP');
+  if (!validateIndianMobile(phone)) return alert('मोबाइल 10 अंक का होना चाहिए (6–9 से शुरू)।');
+  if (!isOTPValid(otp)) return alert('Invalid or expired OTP — Get OTP again after correct phone & email.');
   if (password !== rePass) return alert('Passwords do not match');
   if (findUserByEmail(email, 'customer')) return alert('Email already registered (local)');
 
-  const payload = { name, email, phone, password, role: 'customer' };
+  const payload = { name, email, phone: digitsOnlyPhone(phone), password, role: 'customer' };
   if (address) payload.address = address;
   const API_BASE = (window.F2C_API_ORIGIN || 'http://localhost:5000') + '/api';
 
@@ -120,11 +143,22 @@ async function loginCustomer() {
     if (res.ok) {
       const data = await res.json();
       const user = data.user;
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      var uid = user && (user.id != null ? user.id : user._id);
+      if (uid == null) {
+        alert('Login error: server did not return user id.');
+        return;
+      }
+      localStorage.setItem('currentUser', JSON.stringify({
+        id: String(uid),
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }));
       // auth cookies are set by server (httpOnly); avoid storing tokens in localStorage
-      // role-based redirect
-      if (user.role === 'customer') window.location.href = '../customer-dashboard.html';
-      else window.location.href = '../../FARMER/farmer%20login/farmer-dashboard.html';
+      // role-based redirect (path: from "customer login" folder up to CUSTOMER, then sibling farmer login)
+      var r = (user.role && String(user.role).toLowerCase()) || '';
+      if (r === 'customer') window.location.href = '../customer-dashboard.html';
+      else window.location.href = '../../farmer%20login/farmer-dashboard.html';
       return;
     }
     const err = await res.json().catch(() => ({}));
@@ -162,3 +196,13 @@ function setLanguage(lang) {
     document.getElementById('alreadyAccountText').innerHTML = 'पहले से अकाउंट है? <a href="#" onclick="hideSignup()">लॉगिन</a>';
   } else { location.reload(); }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  var ph = document.getElementById('phone');
+  if (ph) {
+    ph.addEventListener('input', function () {
+      localStorage.removeItem('generatedOTP');
+      localStorage.removeItem('generatedOTPExpiry');
+    });
+  }
+});

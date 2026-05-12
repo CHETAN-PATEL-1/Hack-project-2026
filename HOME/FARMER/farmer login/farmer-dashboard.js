@@ -25,8 +25,21 @@ function setStatus(message, isError = false) {
   statusEl.classList.toggle('error', isError);
 }
 
+/** Stable owner id from product (server may return ownerId as ObjectId string or populated object). */
+function ownerUserId(product) {
+  if (!product || product.ownerId == null) return '';
+  var o = product.ownerId;
+  if (typeof o === 'string' || typeof o === 'number') return String(o);
+  if (typeof o === 'object') {
+    if (o._id != null) return String(o._id);
+    if (o.id != null) return String(o.id);
+  }
+  return String(o);
+}
+
 function ownsProduct(product, userId) {
-  return product.ownerId === userId || (product.ownerId && product.ownerId._id === userId);
+  if (userId == null || userId === '') return false;
+  return ownerUserId(product) === String(userId);
 }
 
 function renderProducts(products) {
@@ -71,7 +84,7 @@ function renderProducts(products) {
 
 async function fetchMyProducts() {
   const user = getCurrentUser();
-  if (!user) return getProductsLocal().filter(p => p.ownerId === user.id);
+  if (!user) return getProductsLocal().filter(p => ownsProduct(p, user && user.id));
 
   try {
     const requestOptions = { method: 'GET', credentials: 'include' };

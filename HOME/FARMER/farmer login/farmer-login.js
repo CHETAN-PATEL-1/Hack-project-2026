@@ -31,12 +31,34 @@ function validateEmail(email) {
   return re.test(email);
 }
 
+function validateIndianMobile(phone) {
+  const digits = String(phone || '').replace(/\D/g, '');
+  return /^[6-9]\d{9}$/.test(digits);
+}
+
+function digitsOnlyPhone(phone) {
+  return String(phone || '').replace(/\D/g, '');
+}
+
 // -------------------- OTP --------------------
 function generateOTP() {
+  const phoneEl = document.getElementById('phone');
+  const emailEl = document.getElementById('signupEmail');
+  const phone = phoneEl ? phoneEl.value.trim() : '';
+  const email = emailEl ? emailEl.value.trim() : '';
+
+  if (!validateIndianMobile(phone)) {
+    return alert('पहले 10 अंकों का वैध मोबाइल नंबर दर्ज करें (6–9 से शुरू)।');
+  }
+  if (!email || !validateEmail(email)) {
+    return alert('पहले ईमेल भरें और Verify करें।');
+  }
+  if (findUserByEmail(email, 'farmer')) return alert('Email already registered');
+
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const expiry = Date.now() + 5 * 60 * 1000; // 5 minutes
   localStorage.setItem('generatedOTP', otp);
-  localStorage.setItem('generatedOTPExpiry', expiry);
+  localStorage.setItem('generatedOTPExpiry', String(expiry));
   alert('Your OTP is: ' + otp + '\n(Valid for 5 minutes)');
 }
 
@@ -70,12 +92,12 @@ async function signupFarmer() {
   }
 
   if (!validateEmail(email)) return alert('Invalid email');
-  if (phone.length < 8) return alert('Enter a valid mobile number');
-  if (!isOTPValid(otp)) return alert('Invalid or expired OTP');
+  if (!validateIndianMobile(phone)) return alert('मोबाइल 10 अंक का होना चाहिए (6–9 से शुरू)।');
+  if (!isOTPValid(otp)) return alert('Invalid or expired OTP — Get OTP again after correct phone & email.');
   if (password !== rePass) return alert('Passwords do not match');
   if (findUserByEmail(email, 'farmer')) return alert('Email already registered (local)');
 
-  const payload = { name, email, phone, password, role: 'farmer' };
+  const payload = { name, email, phone: digitsOnlyPhone(phone), password, role: 'farmer' };
   const API_BASE = (window.F2C_API_ORIGIN || 'http://localhost:5000') + '/api';
 
   try {
@@ -107,7 +129,7 @@ async function signupFarmer() {
       id: 'u' + Date.now(),
       name,
       email,
-      phone,
+      phone: digitsOnlyPhone(phone),
       password, // plain text for demo; replace with hashing on backend
       role: 'farmer',
       createdAt: new Date().toISOString()
@@ -140,14 +162,24 @@ async function loginFarmer() {
     if (res.ok) {
       const data = await res.json();
       const user = data.user;
-      localStorage.setItem('currentUser', JSON.stringify({ id: user._id || user.id, name: user.name, email: user.email, role: user.role }));
+      var uid = user && (user.id != null ? user.id : user._id);
+      if (uid == null) {
+        alert('Login error: server did not return user id.');
+        return;
+      }
+      localStorage.setItem('currentUser', JSON.stringify({
+        id: String(uid),
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }));
       // auth cookies are set by server (httpOnly); avoid storing tokens in localStorage
       // role-based redirect
-      if (user.role === 'farmer') {
+      var r = (user.role && String(user.role).toLowerCase()) || '';
+      if (r === 'farmer') {
         window.location.href = 'farmer-dashboard.html';
       } else {
-        // redirect to customer dashboard
-        window.location.href = '../../CUSTOMER/customer-dashboard.html';
+        window.location.href = '../CUSTOMER/customer-dashboard.html';
       }
       return;
     }
@@ -196,3 +228,13 @@ function setLanguage(lang) {
     location.reload();
   }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  var ph = document.getElementById('phone');
+  if (ph) {
+    ph.addEventListener('input', function () {
+      localStorage.removeItem('generatedOTP');
+      localStorage.removeItem('generatedOTPExpiry');
+    });
+  }
+});

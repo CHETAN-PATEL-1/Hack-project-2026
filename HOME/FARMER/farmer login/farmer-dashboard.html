@@ -67,12 +67,13 @@
       if (meRes && meRes.ok) {
         const data = await meRes.json();
         const u = data.user;
-        if (u.role !== 'farmer') {
+        if (String(u.role || '').toLowerCase() !== 'farmer') {
           localStorage.removeItem('currentUser');
           window.location.href = 'farmer-login.html';
           return;
         }
-        localStorage.setItem('currentUser', JSON.stringify({ id: u._id || u.id, name: u.name, email: u.email, role: u.role }));
+        var uid = u._id != null ? u._id : u.id;
+        localStorage.setItem('currentUser', JSON.stringify({ id: uid != null ? String(uid) : '', name: u.name, email: u.email, role: u.role }));
         document.getElementById('welcome').innerText = `Welcome, ${u.name}`;
       }
     } catch (err) {
