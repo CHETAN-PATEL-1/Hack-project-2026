@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin — Fasal Junction</title>
+  <style>
+    :root { --bg:#0f1419; --card:#1a2332; --accent:#4caf50; --text:#e8eef4; --muted:#8b9bb4; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Segoe UI, system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 24px; }
+    h1 { font-size: 1.35rem; margin: 0 0 8px; }
+    p.note { color: var(--muted); font-size: 0.85rem; margin: 0 0 20px; }
+    .card { background: var(--card); border-radius: 10px; padding: 20px; margin-bottom: 20px; border: 1px solid #2a3544; }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+    input { width: 100%; max-width: 360px; padding: 10px 12px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: var(--text); margin-bottom: 12px; }
+    button { padding: 10px 18px; border-radius: 6px; border: none; background: var(--accent); color: #fff; font-weight: 700; cursor: pointer; margin-right: 8px; }
+    button.secondary { background: #334155; color: var(--text); }
+    #dash { display: none; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .stat { background: #0f172a; padding: 14px; border-radius: 8px; text-align: center; border: 1px solid #2a3544; }
+    .stat b { display: block; font-size: 1.5rem; color: var(--accent); }
+    .stat span { font-size: 0.8rem; color: var(--muted); }
+    canvas { width: 100%; max-width: 100%; height: 220px; background: #0f172a; border-radius: 8px; border: 1px solid #2a3544; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { padding: 8px; text-align: left; border-bottom: 1px solid #2a3544; }
+    th { color: var(--muted); font-weight: 600; }
+    .err { color: #f87171; font-size: 0.9rem; margin-top: 8px; }
+    a { color: #7dd3fc; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Site admin</h1>
+    <p class="note">This URL is not linked from the public site. Use credentials from <code>server/.env</code> (<code>ADMIN_ID</code> / <code>ADMIN_PASSWORD</code>). If unset, server uses built-in demo defaults and logs a warning on startup.</p>
+
+    <div id="loginCard" class="card">
+      <h2 style="margin-top:0;font-size:1.1rem;">Sign in</h2>
+      <label for="user">Admin username</label>
+      <input id="user" autocomplete="username" placeholder="ADMIN_ID from .env" />
+      <label for="pass">Password</label>
+      <input id="pass" type="password" autocomplete="current-password" />
+      <button type="button" id="btnLogin">Login</button>
+      <div id="loginErr" class="err"></div>
+    </div>
+
+    <div id="dash" class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <h2 style="margin:0;font-size:1.1rem;">Overview</h2>
+        <div>
+          <button type="button" class="secondary" id="btnRefresh">Refresh</button>
+          <button type="button" class="secondary" id="btnLogout">Logout</button>
+        </div>
+      </div>
+      <div class="stats" style="margin-top:16px;">
+        <div class="stat"><b id="sUsers">—</b><span>Users</span></div>
+        <div class="stat"><b id="sFarmers">—</b><span>Farmers</span></div>
+        <div class="stat"><b id="sCustomers">—</b><span>Customers</span></div>
+        <div class="stat"><b id="sProducts">—</b><span>Products</span></div>
+      </div>
+      <p class="note" style="margin-bottom:8px;">New product listings per day (last 7 days) — activity proxy until order data exists.</p>
+      <canvas id="chart" width="900" height="240"></canvas>
+      <h3 style="margin:20px 0 8px;font-size:1rem;">Recent products</h3>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Name</th><th>Price</th><th>Farmer</th><th>Phone</th><th>Listed</th></tr></thead>
+          <tbody id="recentBody"></tbody>
+        </table>
+      </div>
+      <div id="dashErr" class="err"></div>
+    </div>
+  </div>
+
+  <script src="../shared/apiOrigin.js"></script>
+  <script>
+(function () {
+  var API = (window.F2C_API_ORIGIN || 'http://localhost:5000') + '/api/admin';
+
+  function drawChart(listingsByDay) {
+    var canvas = document.getElementById('chart');
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, w, h);
+
+    var days = [];
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date();
+      d.setDate(d.getDate() - i);
+      var key = d.toISOString().slice(0, 10);
+      days.push(key);
+    }
+    var counts = days.map(function (key) {
+      var row = (listingsByDay || []).find(function (x) { return x._id === key; });
+      return row ? row.count : 0;
+    });
+    var max = Math.max.apply(null, counts.concat([1]));
+    var barW = (w - 80) / days.length;
+    ctx.fillStyle = '#8b9bb4';
+    ctx.font = '12px sans-serif';
+    days.forEach(function (key, idx) {
+      var x = 40 + idx * barW + 6;
+      var bh = (counts[idx] / max) * (h - 70);
+      var y = h - 50 - bh;
+      ctx.fillStyle = '#4caf50';
+      ctx.fillRect(x, y, barW - 12, bh);
+      ctx.fillStyle = '#8b9bb4';
+      ctx.save();
+      ctx.translate(x + barW / 2 - 18, h - 35);
+      ctx.rotate(-0.35);
+      ctx.fillText(key.slice(5), 0, 0);
+      ctx.restore();
+    });
+    ctx.fillStyle = '#64748b';
+    ctx.font = '13px sans-serif';
+    ctx.fillText('Listings per day', 40, 24);
+  }
+
+  function showDash() {
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('dash').style.display = 'block';
+  }
+
+  function showLogin() {
+    document.getElementById('loginCard').style.display = 'block';
+    document.getElementById('dash').style.display = 'none';
+  }
+
+  async function loadStats() {
+    document.getElementById('dashErr').textContent = '';
+    try {
+      var res = await fetch(API + '/stats', { credentials: 'include' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var d = await res.json();
+      document.getElementById('sUsers').textContent = d.users;
+      document.getElementById('sFarmers').textContent = d.farmers;
+      document.getElementById('sCustomers').textContent = d.customers;
+      document.getElementById('sProducts').textContent = d.products;
+      drawChart(d.listingsByDay || []);
+      var tb = document.getElementById('recentBody');
+      tb.innerHTML = '';
+      (d.recentProducts || []).forEach(function (p) {
+        var tr = document.createElement('tr');
+        var farmer = (p.ownerId && p.ownerId.name) || '—';
+        var phone = (p.ownerId && p.ownerId.phone) || '—';
+        var when = p.createdAt ? new Date(p.createdAt).toLocaleString() : '—';
+        tr.innerHTML = '<td>' + (p.name || '') + '</td><td>₹' + (p.price != null ? p.price : '') + '</td><td>' + farmer + '</td><td>' + phone + '</td><td>' + when + '</td>';
+        tb.appendChild(tr);
+      });
+    } catch (e) {
+      document.getElementById('dashErr').textContent = 'Could not load stats (session expired?). Log in again.';
+      showLogin();
+    }
+  }
+
+  document.getElementById('btnLogin').addEventListener('click', async function () {
+    document.getElementById('loginErr').textContent = '';
+    var username = document.getElementById('user').value.trim();
+    var password = document.getElementById('pass').value;
+    try {
+      var res = await fetch(API + '/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username: username, password: password })
+      });
+      if (!res.ok) {
+        var err = await res.json().catch(function () { return {}; });
+        throw new Error(err.message || 'Login failed');
+      }
+      showDash();
+      await loadStats();
+    } catch (e) {
+      document.getElementById('loginErr').textContent = e.message || 'Login failed';
+    }
+  });
+
+  document.getElementById('btnLogout').addEventListener('click', async function () {
+    await fetch(API + '/logout', { method: 'POST', credentials: 'include' });
+    showLogin();
+  });
+
+  document.getElementById('btnRefresh').addEventListener('click', loadStats);
+})();
+  </script>
+</body>
+</html>

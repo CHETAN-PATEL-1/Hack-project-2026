@@ -29,6 +29,40 @@
     };
   }
 
+  function addProductToCart(p) {
+    var pid = String(p._id || p.id || '');
+    if (!pid) {
+      alert('Cannot add this product to cart (missing id).');
+      return;
+    }
+    var farmerName = (p.ownerId && p.ownerId.name) || 'Farmer';
+    var farmerPhone = (p.ownerId && p.ownerId.phone) ? String(p.ownerId.phone).replace(/\D/g, '') : '';
+    var img = p.image || '';
+    if (img.startsWith('/uploads')) img = API_ORIGIN + img;
+    try {
+      var cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      var existing = cart.find(function (i) { return String(i.productId) === pid; });
+      if (existing) {
+        existing.quantity += 1;
+        if (farmerPhone) existing.farmerPhone = farmerPhone;
+      } else {
+        cart.push({
+          productId: pid,
+          name: p.name || 'Product',
+          price: Number(p.price) || 0,
+          image: img,
+          farmer: farmerName,
+          farmerPhone: farmerPhone,
+          quantity: 1
+        });
+      }
+      localStorage.setItem('cart', JSON.stringify(cart));
+      alert((p.name || 'Item') + ' added to cart. Open Cart from the menu to checkout or call the farmer.');
+    } catch (e) {
+      alert('Could not update cart.');
+    }
+  }
+
   function makeCard(p){
     const card = document.createElement('article');
     card.className = 'card';
@@ -60,9 +94,31 @@
     price.className = 'price';
     price.textContent = (p.price != null ? `₹ ${p.price}` : 'Price N/A');
 
+    const phoneRow = document.createElement('div');
+    phoneRow.className = 'phone-row';
+    var ph = (p.ownerId && p.ownerId.phone) ? String(p.ownerId.phone).trim() : '';
+    if (ph) {
+      var digits = ph.replace(/\D/g, '');
+      phoneRow.innerHTML = 'Farmer phone: <a href="tel:' + digits + '">' + ph + '</a> <span style="color:#666;font-size:0.85rem">(call to order)</span>';
+    } else {
+      phoneRow.textContent = 'Farmer phone: not provided';
+      phoneRow.style.color = '#888';
+    }
+
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-cart';
+    btn.textContent = 'Add to cart';
+    btn.addEventListener('click', function () { addProductToCart(p); });
+
     body.appendChild(title);
     body.appendChild(meta);
     body.appendChild(price);
+    body.appendChild(phoneRow);
+    actions.appendChild(btn);
+    body.appendChild(actions);
 
     card.appendChild(img);
     card.appendChild(body);

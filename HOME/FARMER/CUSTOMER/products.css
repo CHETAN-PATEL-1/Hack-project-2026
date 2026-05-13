@@ -31,6 +31,11 @@ body{font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;background:
 .card .body{padding:12px;flex:1;display:flex;flex-direction:column}
 .card h3{margin:0 0 8px 0;font-size:1.05rem}
 .card .meta{color:var(--muted);font-size:0.9rem;margin-bottom:8px}
-.card .price{font-weight:700;margin-top:auto}
+.card .price{font-weight:700;margin-top:8px}
+.card .phone-row{font-size:0.9rem;margin-top:6px;color:#0d47a1}
+.card .phone-row a{color:#1565c0;font-weight:600}
+.card .card-actions{margin-top:auto;padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.card .btn-cart{padding:10px 12px;border:none;border-radius:6px;background:#2b8a3e;color:#fff;font-weight:600;cursor:pointer}
+.card .btn-cart:hover{background:#246b32}
 .empty{padding:40px;text-align:center;color:var(--muted)}
 @media (max-width:480px){.card img{height:120px}}

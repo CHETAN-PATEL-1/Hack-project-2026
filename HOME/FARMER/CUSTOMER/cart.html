@@ -91,6 +91,7 @@
         <div class="item-details">
           <h4>${item.name}</h4>
           <p>Farmer: ${item.farmer}</p>
+          ${item.farmerPhone ? `<p class="call-farmer">Call: <a href="tel:${String(item.farmerPhone).replace(/\D/g, '')}">${item.farmerPhone}</a></p>` : ''}
           <p>Price: ₹${item.price} / kg</p>
           <div class="quantity-controls">
             <button class="qty-btn" data-index="${index}" data-action="decrease">-</button>
@@ -151,12 +152,24 @@
     document.getElementById('paymentAmount').innerText = totalAmount;
 
     // Show farmer contacts
-    const farmers = [...new Set(cart.map(item => item.farmer))];
     const farmerList = document.getElementById('farmerList');
     farmerList.innerHTML = '';
-    farmers.forEach(farmer => {
+    const phoneByFarmer = {};
+    cart.forEach(function (item) {
+      if (item.farmer && item.farmerPhone && !phoneByFarmer[item.farmer]) {
+        phoneByFarmer[item.farmer] = item.farmerPhone;
+      }
+    });
+    const names = [...new Set(cart.map(function (item) { return item.farmer; }))];
+    names.forEach(function (farmer) {
       const p = document.createElement('p');
-      p.innerText = `${farmer}: Contact via app or phone`;
+      var ph = phoneByFarmer[farmer];
+      if (ph) {
+        var digits = String(ph).replace(/\D/g, '');
+        p.innerHTML = farmer + ': <a href="tel:' + digits + '">' + ph + '</a>';
+      } else {
+        p.textContent = farmer + ': phone not in cart — check marketplace listing';
+      }
       farmerList.appendChild(p);
     });
 

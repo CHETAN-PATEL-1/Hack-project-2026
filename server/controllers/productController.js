@@ -21,7 +21,7 @@ exports.createProduct = async (req, res) => {
     const product = new Product({ name, price, quantity, image: imagePath, notes, category, location, ownerId: req.user.id });
     await product.save();
     // populate owner name for client convenience
-    await product.populate('ownerId', 'name');
+    await product.populate('ownerId', 'name phone');
     res.status(201).json({ product });
   } catch (err) {
     console.error(err);
@@ -32,7 +32,7 @@ exports.createProduct = async (req, res) => {
 // GET /api/products/mine (protected)
 exports.getMyProducts = async (req, res) => {
   try {
-    const products = await Product.find({ ownerId: req.user.id }).sort({ createdAt: -1 }).populate('ownerId', 'name');
+    const products = await Product.find({ ownerId: req.user.id }).sort({ createdAt: -1 }).populate('ownerId', 'name phone');
     res.json({ products });
   } catch (err) {
     console.error(err);
@@ -62,7 +62,7 @@ exports.updateProduct = async (req, res) => {
     }
 
     await product.save();
-    await product.populate('ownerId', 'name');
+    await product.populate('ownerId', 'name phone');
     res.json({ product });
   } catch (err) {
     console.error(err);
@@ -132,12 +132,12 @@ exports.getAllProducts = async (req, res) => {
         { $skip: skip },
         { $limit: limit },
         { $addFields: { ownerId: '$owner' } },
-        { $project: { owner: 0, 'ownerId.password': 0, 'ownerId.email': 0 } }
+        { $project: { owner: 0, 'ownerId.password': 0, 'ownerId.email': 0, 'ownerId.refreshTokens': 0 } }
       ];
       products = await Product.aggregate(aggregatePipeline);
     } else {
       total = await Product.countDocuments(filter);
-      products = await Product.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('ownerId', 'name');
+      products = await Product.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).populate('ownerId', 'name phone');
     }
 
     const totalPages = Math.ceil(total / limit) || 1;

@@ -33,6 +33,7 @@ app.get('/api', (req, res) => res.json({ ok: true, message: 'Farm2Consumer API' 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/admin', require('./routes/admin'));
 
 app.use('/uploads', express.static(uploadsDir));
 
@@ -48,5 +49,6 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   if (fs.existsSync(homeDir)) {
     console.log(`Open the app: http://localhost:${PORT}/`);
+    console.log(`Admin console (hidden path): http://localhost:${PORT}/_admin/index.html`);
   }
 });
